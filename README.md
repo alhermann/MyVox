@@ -27,3 +27,5 @@ Pass an ```.stl``` file path as an argument. The voxelized output will be placed
 ```cd ~/MyVox/build
 ./MyVox ./model.stl
 ```
+![STL](./stl_model.png "STL")
+![VOX](./vox_model.png "Voxelization") 
