@@ -2,6 +2,7 @@
 #define AAB_H
 
 #include <iostream>
+#include <limits>
 #include "Vec2.h"
 
 // Axis Aligned Box
