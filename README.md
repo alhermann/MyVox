@@ -1,6 +1,6 @@
 # MyVox
 Lightweight, simple, C++ voxelizer based on the implementation of https://github.com/sylefeb/VoxSurf. 
-For further details on the algorithm, refer to their repo.
+For further details on the algorithm, refer to their repository.
 
 Voxelizer implementation requires no further dependencies. It operates on ```.stl``` files and outputs a ```.csv``` file
 which is intented to be processed further with ```Paraview```. 
