@@ -20,12 +20,12 @@ Make sure to use the correct C++ compiler for your machine. For MacOS change ins
 for ```Linux``` machines use ```CC = g++``` (default) and on ```Windows``` machines use ```icpc``` or ```g++``` from the ```MinGW```
 compiler.
 
-### Example
+## Example
 
 Pass an ```.stl``` file path as an argument. The voxelized output will be placed inside the ```build``` directory.
 
 ```cd ~/MyVox/build
-./MyVox ./model.stl
+./MyVox ../model.stl
 ```
 ![STL](./stl_model.png "STL")
 ![VOX](./vox_model.png "Voxelization") 
