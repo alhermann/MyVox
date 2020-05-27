@@ -17,7 +17,7 @@ make
 ```
 
 Make sure to use the correct C++ compiler for your machine. For MacOS change inside the ```Makefile``` to ```clang++```, 
-for ```Linux```machines use ```CC = g++``` (default) and on ```Windows``` machines use ```icpc```or ```g++``` from the ```MinGW```
+for ```Linux``` machines use ```CC = g++``` (default) and on ```Windows``` machines use ```icpc```or ```g++``` from the ```MinGW```
 compiler.
 
 ### Example
