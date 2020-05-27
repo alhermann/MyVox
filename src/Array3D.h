@@ -8,7 +8,7 @@ template <typename T_Type>
 class Array3D
 {
     public:
-        T_Type *m_Data;
+        T_Type *m_Data = NULL;
         int m_xSize;
         int m_ySize;
         int m_zSize;
