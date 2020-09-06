@@ -18,6 +18,7 @@
 // Macros
 #define VOXEL_RESOLUTION 128
 #define VOXEL_FILL_INSIDE 1
+#define VOXEL_ROBUST_FILL 1
 
 // --------------------------------------------------------------
 
@@ -25,6 +26,9 @@
 #define ALONG_Y  2
 #define ALONG_Z  4
 #define INSIDE   8
+#define INSIDE_X 16
+#define INSIDE_Y 32
+#define INSIDE_Z 64
 
 // --------------------------------------------------------------
 
@@ -185,6 +189,75 @@ void rasterize(
         }
     }
  
+ // --------------------------------------------------------------
+
+// This version is more robust by using all three direction
+// and voting among them to decide what is filled or not
+void fillInsideVoting(Array3D<unsigned char>& _voxs)
+{
+  // along x
+  for(int k = 0; k < _voxs.zsize(); k++){
+    for(int j = 0; j < _voxs.ysize(); j++){
+      bool inside = false;
+      for(int i = 0; i < _voxs.xsize(); i++){
+        if (_voxs.at(i, j, k) & ALONG_X) {
+          inside = !inside;
+        }
+        if (inside) {
+          _voxs.at(i, j, k) |= INSIDE_X;
+        }
+      }
+    }
+  }
+  // along y
+  for(int k = 0; k < _voxs.zsize(); k++){
+    for(int j = 0; j < _voxs.ysize(); j++){
+      bool inside = false;
+      for(int i = 0; i < _voxs.xsize(); i++){
+        if (_voxs.at(j, i, k) & ALONG_Y) {
+          inside = !inside;
+        }
+        if (inside) {
+          _voxs.at(j, i, k) |= INSIDE_Y;
+        }
+      }
+    }
+  }
+  // along z
+  for(int k = 0; k < _voxs.zsize(); k++){
+    for(int j = 0; j < _voxs.ysize(); j++){
+      bool inside = false;
+      for(int i = 0; i < _voxs.xsize(); i++){
+        if (_voxs.at(j, k, i) & ALONG_Z) {
+          inside = !inside;
+        }
+        if (inside) {
+          _voxs.at(j, k, i) |= INSIDE_Z;
+        }
+      }
+    }
+  }
+  // voting
+ for(int k = 0; k < (int)_voxs.zsize(); k++){
+        for(int j = 0; j < (int)_voxs.ysize(); j++){
+            for (int i = 0; i < (int)_voxs.xsize(); i++){
+                unsigned char v = _voxs.at(i, j, k);
+                int votes =
+                (  (v & INSIDE_X) ? 1 : 0)
+                + ((v & INSIDE_Y) ? 1 : 0)
+                + ((v & INSIDE_Z) ? 1 : 0);
+                // clean
+                _voxs.at(i, j, k) &= ~(INSIDE_X | INSIDE_Y | INSIDE_Z);
+                if (votes > 1) {
+                // tag as inside
+                _voxs.at(i, j, k) |= INSIDE;
+                }
+            }
+        }
+    }
+}
+
+
 // --------------------------------------------------------------
 
 void fillInside(Array3D<unsigned char>& _voxs){
@@ -278,7 +351,11 @@ int main(int argc, char* argv[])
         Timer tm("Fill");
         std::cout << "Filling in/out ... ";
 
-        fillInside(voxs);
+        #if VOXEL_ROBUST_FILL
+            fillInsideVoting(voxs);
+        #else
+            fillInside(voxs);
+        #endif
 
         std::cout << " done." << std::endl;
     }
