@@ -223,61 +223,61 @@ void rasterize(
 void fillInsideVoting(Array3D<unsigned char>& _voxs)
 {
   // along x
-  for(int k = 0; k < _voxs.zsize(); k++){
-    for(int j = 0; j < _voxs.ysize(); j++){
+  for(int k = 0; k < (int)_voxs.zsize(); k++){
+    for(int j = 0; j < (int)_voxs.ysize(); j++){
       bool inside = false;
-      for(int i = 0; i < _voxs.xsize(); i++){
-        if (_voxs.at(i, j, k) & ALONG_X) {
+      for(int i = 0; i < (int)_voxs.xsize(); i++){
+        if (_voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) & ALONG_X) {
           inside = !inside;
         }
         if (inside) {
-          _voxs.at(i, j, k) |= INSIDE_X;
+          _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) |= INSIDE_X;
         }
       }
     }
   }
   // along y
-  for(int k = 0; k < _voxs.zsize(); k++){
-    for(int j = 0; j < _voxs.ysize(); j++){
+  for(int k = 0; k < (int)_voxs.zsize(); k++){
+    for(int j = 0; j < (int)_voxs.xsize(); j++){
       bool inside = false;
-      for(int i = 0; i < _voxs.xsize(); i++){
-        if (_voxs.at(j, i, k) & ALONG_Y) {
+      for(int i = 0; i < (int)_voxs.ysize(); i++){
+        if (_voxs.at((unsigned int)j, (unsigned int)i, (unsigned int)k) & ALONG_Y) {
           inside = !inside;
         }
         if (inside) {
-          _voxs.at(j, i, k) |= INSIDE_Y;
+          _voxs.at((unsigned int)j, (unsigned int)i, (unsigned int)k) |= INSIDE_Y;
         }
       }
     }
   }
   // along z
-  for(int k = 0; k < _voxs.zsize(); k++){
-    for(int j = 0; j < _voxs.ysize(); j++){
+  for(int k = 0; k < (int)_voxs.zsize(); k++){
+    for(int j = 0; j < (int)_voxs.xsize(); j++){
       bool inside = false;
-      for(int i = 0; i < _voxs.xsize(); i++){
-        if (_voxs.at(j, k, i) & ALONG_Z) {
+      for(int i = 0; i < (int)_voxs.ysize(); i++){
+        if (_voxs.at((unsigned int)j, (unsigned int)k, (unsigned int)i) & ALONG_Z) {
           inside = !inside;
         }
         if (inside) {
-          _voxs.at(j, k, i) |= INSIDE_Z;
+          _voxs.at((unsigned int)j, (unsigned int)k, (unsigned int)i) |= INSIDE_Z;
         }
       }
     }
   }
   // voting
- for(int k = 0; k < _voxs.zsize(); k++){
-        for(int j = 0; j < _voxs.ysize(); j++){
-            for (int i = 0; i < _voxs.xsize(); i++){
-                unsigned char v = _voxs.at(i, j, k);
+ for(int k = 0; k < (int)_voxs.zsize(); k++){
+        for(int j = 0; j < (int)_voxs.ysize(); j++){
+            for (int i = 0; i < (int)_voxs.xsize(); i++){
+                unsigned char v = _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k);
                 int votes =
                 (  (v & INSIDE_X) ? 1 : 0)
                 + ((v & INSIDE_Y) ? 1 : 0)
                 + ((v & INSIDE_Z) ? 1 : 0);
                 // clean
-                _voxs.at(i, j, k) &= ~(INSIDE_X | INSIDE_Y | INSIDE_Z);
+                _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) &= ~(INSIDE_X | INSIDE_Y | INSIDE_Z);
                 if (votes > 1) {
                 // tag as inside
-                _voxs.at(i, j, k) |= INSIDE;
+                _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) |= INSIDE;
                 }
             }
         }
