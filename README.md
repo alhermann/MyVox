@@ -1,5 +1,5 @@
 # MyVox
-Lightweight, simple, C++ voxelizer based on the implementation of https://github.com/sylefeb/VoxSurf. 
+Lightweight, simple, C++, CPU-based voxelizer based on the implementation of https://github.com/sylefeb/VoxSurf. 
 For further details on the algorithm, refer to their repository.
 
 Voxelizer implementation requires no further dependencies. It operates on ```.stl``` files and outputs a ```.csv``` file
