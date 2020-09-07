@@ -16,7 +16,7 @@
 // --------------------------------------------------------------
 
 // Macros
-#define VOXEL_RESOLUTION 128
+#define VOXEL_RESOLUTION 256
 #define VOXEL_FILL_INSIDE 1
 #define VOXEL_ROBUST_FILL 1
 
@@ -24,7 +24,7 @@
 
 #define ALONG_X  1
 #define ALONG_Y  2
-#define ALONG_Z  4
+#define ALONG_Z  4 
 #define INSIDE   8
 #define INSIDE_X 16
 #define INSIDE_Y 32
@@ -35,6 +35,16 @@
 #define FP_POW 16
 #define FP_SCALE (1<<FP_POW)
 #define BOX_SCALE Vec3(VOXEL_RESOLUTION*FP_SCALE)
+
+// --------------------------------------------------------------
+
+#define EPS 10E-12
+
+// --------------------------------------------------------------
+
+#define SCALE_X 0
+#define SCALE_Y 0
+#define SCALE_Z 1
 
 // --------------------------------------------------------------
 
@@ -65,12 +75,17 @@ const Vec3 clamp(const Vec3& _Vec3, const Vec3& _Vec3Min, const Vec3& _Vec3Max) 
 // --------------------------------------------------------------
 
 // saves a .csv voxel file
-void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs){
+void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs, 
+                double& xMax, double& yMax, double& zMax, 
+                double& xMin, double& yMin, double& zMin, 
+                double& xMaxVox, double& yMaxVox, double& zMaxVox,
+                double& xMinVox, double& yMinVox, double& zMinVox){
     std::ofstream f;
     long sx = voxs.xsize(), sy = voxs.ysize(), sz = voxs.zsize();
     f.open(fname, std::ios::out | std::ios::trunc);
     f << "X," << "Y," << "Z" << std::endl;
 
+    int auxOut = 0;
     for(int i = sx - 1; i >= 0; i--){
         for(int j = 0; j < sy; j++){
             for(int k = sz - 1; k >= 0; k--){
@@ -81,7 +96,19 @@ void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs){
                     pal = 1;
                 }
                 if (pal == 1){
-                    f << i << "," << j << "," << k << std::endl;
+                    if ((std::abs(xMax - xMin) > EPS) && (std::abs(xMaxVox - xMinVox) > EPS) && (SCALE_X))
+                        f << static_cast<double>(i)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) << "," << static_cast<double>(j)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) << "," << static_cast<double>(k)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) << std::endl;
+                    else if ((std::abs(yMax - yMin) > EPS) && (std::abs(yMaxVox - yMinVox) > EPS) && (SCALE_Y))
+                        f << static_cast<double>(i)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << "," << static_cast<double>(j)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << "," << static_cast<double>(k)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << std::endl;
+                    else if ((std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS) && (SCALE_Z))
+                        f << static_cast<double>(i)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << "," << static_cast<double>(j)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << "," << static_cast<double>(k)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << std::endl;
+                    else {
+                        if (auxOut != 1){
+                            std::cout << "No scaling could be done!\n" << std::endl; 
+                            auxOut = 1;
+                        }
+                        f << i << "," << j << "," << k << std::endl; 
+                    }
                 }
             }
         }
@@ -293,6 +320,19 @@ int main(int argc, char* argv[])
     // Produce (fixed fp) integer vertices and triangles
     std::vector<Vec3> pts;
     std::vector<Vec3> tris;
+
+    double xMax = 0.0;
+    double yMax = 0.0;
+    double zMax = 0.0;
+    double xMin = 1e20f;
+    double yMin = 1e20f;
+    double zMin = 1e20f;
+    double xMaxVox = 0.0;
+    double yMaxVox = 0.0;
+    double zMaxVox = 0.0;
+    double xMinVox = 1e20f;
+    double yMinVox = 1e20f;
+    double zMinVox = 1e20f;
     {
         // tmp variables for same floating point precision
         float factor = 0.95f;
@@ -317,6 +357,22 @@ int main(int argc, char* argv[])
             Vec3 bxpt = boxtrsf.mulPointFloat(pt);
             Vec3 ipt = clamp(bxpt.round2int(), Vec3(0.0f), BOX_SCALE - Vec3(1.0f));
             pts[p] = ipt;
+        }
+
+        for (int p = 0; p < geo.get_num_vert(); p++){
+            if ((geo.posAt(p)(0)) > xMax)
+                xMax = static_cast<double>(geo.posAt(p)(0));
+            if ((geo.posAt(p)(1)) > yMax)
+                yMax = static_cast<double>(geo.posAt(p)(1));
+            if ((geo.posAt(p)(2)) > zMax)
+                zMax = static_cast<double>(geo.posAt(p)(2));
+
+            if ((geo.posAt(p)(0)) < xMin)
+                xMin = static_cast<double>(geo.posAt(p)(0));
+            if ((geo.posAt(p)(1)) < yMin)
+                yMin = static_cast<double>(geo.posAt(p)(1));
+            if ((geo.posAt(p)(2)) < zMin)
+                zMin = static_cast<double>(geo.posAt(p)(2));
         }
 
         // prepare triangles
@@ -361,8 +417,30 @@ int main(int argc, char* argv[])
     }
 #endif
 
+    for(int k = 0; k < (int)voxs.zsize(); k++){
+        for(int j = 0; j < (int)voxs.ysize(); j++){
+            for (int i = 0; i < (int)voxs.xsize(); i++){
+                if (voxs.at(i, j, k) > 0) {
+                    if (static_cast<double>(i) > xMaxVox)
+                        xMaxVox = static_cast<double>(i);
+                    if (static_cast<double>(j) > yMaxVox)
+                        yMaxVox = static_cast<double>(j);
+                    if (static_cast<double>(k) > zMaxVox)
+                        zMaxVox = static_cast<double>(k);
+
+                    if (static_cast<double>(i) < xMinVox)
+                        xMinVox = static_cast<double>(i);
+                    if (static_cast<double>(j) < yMinVox)
+                        yMinVox = static_cast<double>(j);
+                    if (static_cast<double>(k) < zMinVox)
+                        zMinVox = static_cast<double>(k);
+                }
+            }
+        }
+    }
+
     // save the result
-    saveAsCSV("out.csv", voxs);
+    saveAsCSV("out.csv", voxs, xMax, yMax, zMax, xMin, yMin, zMin, xMaxVox, yMaxVox, zMaxVox, xMinVox, yMinVox, zMinVox);
 
     // report some stats
     int num_in_vox = 0;
