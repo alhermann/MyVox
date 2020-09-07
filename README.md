@@ -5,6 +5,9 @@ For further details on the algorithm, refer to their repository.
 Voxelizer implementation requires no further dependencies. It operates on ```.stl``` files and outputs a ```.csv``` file
 which is intented to be processed further with ```Paraview```. 
 
+This voxelizer implementation ouputs the same results as the base implementation of VoxSurf without any further dependencies. 
+Additionally, it has the option to scale the voxelization to approximately the same size as the underlying ```.stl``` file.
+
 ## Getting Started
 
 Clone the repository to your local machine and to the project build directory. It comes with a ```Makefile```, therefore you only
