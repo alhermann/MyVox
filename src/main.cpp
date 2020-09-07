@@ -18,11 +18,11 @@
 // Macros
 #define VOXEL_RESOLUTION 128
 #define VOXEL_FILL_INSIDE 1
-#define VOXEL_ROBUST_FILL 0
+#define VOXEL_ROBUST_FILL 1
 
 // --------------------------------------------------------------
 
-#define ALONG_X  1
+#define ALONG_X  1 
 #define ALONG_Y  2
 #define ALONG_Z  4 
 #define INSIDE   8
@@ -227,11 +227,11 @@ void fillInsideVoting(Array3D<unsigned char>& _voxs)
     for(int j = 0; j < _voxs.ysize(); j++){
       bool inside = false;
       for(int i = 0; i < _voxs.xsize(); i++){
-        if (_voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) & ALONG_X) {
+        if (_voxs.at(i, j, k) & ALONG_X) {
           inside = !inside;
         }
         if (inside) {
-          _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) |= INSIDE_X;
+          _voxs.at(i, j, k) |= INSIDE_X;
         }
       }
     }
@@ -241,11 +241,11 @@ void fillInsideVoting(Array3D<unsigned char>& _voxs)
     for(int j = 0; j < _voxs.ysize(); j++){
       bool inside = false;
       for(int i = 0; i < _voxs.xsize(); i++){
-        if (_voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) & ALONG_Y) {
+        if (_voxs.at(j, i, k) & ALONG_Y) {
           inside = !inside;
         }
         if (inside) {
-          _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) |= INSIDE_Y;
+          _voxs.at(j, i, k) |= INSIDE_Y;
         }
       }
     }
@@ -255,29 +255,29 @@ void fillInsideVoting(Array3D<unsigned char>& _voxs)
     for(int j = 0; j < _voxs.ysize(); j++){
       bool inside = false;
       for(int i = 0; i < _voxs.xsize(); i++){
-        if (_voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) & ALONG_Z) {
+        if (_voxs.at(j, k, i) & ALONG_Z) {
           inside = !inside;
         }
         if (inside) {
-          _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) |= INSIDE_Z;
+          _voxs.at(j, k, i) |= INSIDE_Z;
         }
       }
     }
   }
   // voting
- for(int k = 0; k < (int)_voxs.zsize(); k++){
-        for(int j = 0; j < (int)_voxs.ysize(); j++){
-            for (int i = 0; i < (int)_voxs.xsize(); i++){
-                unsigned char v = _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k);
+ for(int k = 0; k < _voxs.zsize(); k++){
+        for(int j = 0; j < _voxs.ysize(); j++){
+            for (int i = 0; i < _voxs.xsize(); i++){
+                unsigned char v = _voxs.at(i, j, k);
                 int votes =
                 (  (v & INSIDE_X) ? 1 : 0)
                 + ((v & INSIDE_Y) ? 1 : 0)
                 + ((v & INSIDE_Z) ? 1 : 0);
                 // clean
-                _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) &= ~(INSIDE_X | INSIDE_Y | INSIDE_Z);
+                _voxs.at(i, j, k) &= ~(INSIDE_X | INSIDE_Y | INSIDE_Z);
                 if (votes > 1) {
                 // tag as inside
-                _voxs.at((unsigned int)i, (unsigned int)j, (unsigned int)k) |= INSIDE;
+                _voxs.at(i, j, k) |= INSIDE;
                 }
             }
         }
@@ -335,26 +335,26 @@ int main(int argc, char* argv[])
     double zMinVox = 1e20f;
     {
         // tmp variables for same floating point precision
-        float factor = 0.95f;
-        float bbMax = std::max(std::max(geo.get_bbox().x,geo.get_bbox().y),geo.get_bbox().z);
+        double factor = 0.95f;
+        double bbMax = std::max(std::max(geo.get_bbox().x,geo.get_bbox().y),geo.get_bbox().z);
         Vec3 tmp1 = (Vec3(1.f) / bbMax);
-        Vec3 tmp2___ = Vec3(float(geo.get_bbox().x), float(geo.get_bbox().y), float(geo.get_bbox().z));
+        Vec3 tmp2___ = Vec3(double(geo.get_bbox().x), double(geo.get_bbox().y), double(geo.get_bbox().z));
         Vec3 tmp2__ = 0.5f * tmp2___;
         Vec3 tmp2_ = (1 - factor) * tmp2__;
-        Vec3 tmp2 = Vec3(float(tmp2_.x), float(tmp2_.y), float(tmp2_.z));
+        Vec3 tmp2 = Vec3(double(tmp2_.x), double(tmp2_.y), double(tmp2_.z));
         Vec3 tmp3 = Vec3(factor);
         Vec3 tmp4 = -1 * geo.get_bbox_Min_Corner();
         Matrix4d<> boxtrsf = scaleMatrix(BOX_SCALE) 
-                            * scaleMatrix(Vec3(float(tmp1.x), float(tmp1.y), float(tmp1.z))) 
-                            * translationMatrix(Vec3(float(tmp2.x), float(tmp2.y), float(tmp2.z)))
-                            * scaleMatrix(Vec3(float(tmp3.x), float(tmp3.y), float(tmp3.z)))
-                            * translationMatrix(Vec3(float(tmp4.x), float(tmp4.y), float(tmp4.z)));
+                            * scaleMatrix(Vec3(double(tmp1.x), double(tmp1.y), double(tmp1.z))) 
+                            * translationMatrix(Vec3(double(tmp2.x), double(tmp2.y), double(tmp2.z)))
+                            * scaleMatrix(Vec3(double(tmp3.x), double(tmp3.y), double(tmp3.z)))
+                            * translationMatrix(Vec3(double(tmp4.x), double(tmp4.y), double(tmp4.z)));
                             
         // transform vertices
         pts.resize(geo.get_num_vert());
         for (int p = 0; p < geo.get_num_vert(); p++){
             Vec3 pt = geo.posAt(p); 
-            Vec3 bxpt = boxtrsf.mulPointFloat(pt);
+            Vec3 bxpt = boxtrsf.mulPoint(pt);
             Vec3 ipt = clamp(bxpt.round2int(), Vec3(0.0f), BOX_SCALE - Vec3(1.0f));
             pts[p] = ipt;
         }
