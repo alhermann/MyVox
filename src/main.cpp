@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
 {
     // Input 
     if (argc != 2){
-        std::cerr << "Usage: ./voxelizer <path to file>.stl" << std::endl;
+        std::cerr << "Usage: ./MyVox <path to file>.stl" << std::endl;
         std::exit(EXIT_FAILURE);
     }
     try{
