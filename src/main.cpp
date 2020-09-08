@@ -16,7 +16,7 @@
 // --------------------------------------------------------------
 
 // Macros
-#define VOXEL_RESOLUTION 128
+#define VOXEL_RESOLUTION 256
 #define VOXEL_FILL_INSIDE 1
 #define VOXEL_ROBUST_FILL 1
 
@@ -44,7 +44,7 @@
 
 #define SCALE_X 0
 #define SCALE_Y 0
-#define SCALE_Z 1
+#define SCALE_Z 0
 
 // --------------------------------------------------------------
 
@@ -102,6 +102,8 @@ void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs,
                         f << static_cast<double>(i)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << "," << static_cast<double>(j)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << "," << static_cast<double>(k)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << std::endl;
                     else if ((std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS) && (SCALE_Z))
                         f << static_cast<double>(i)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << "," << static_cast<double>(j)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << "," << static_cast<double>(k)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << std::endl;
+                    else if ((std::abs(xMax - xMin) > EPS) && (std::abs(xMaxVox - xMinVox) > EPS) && (std::abs(yMax - yMin) > EPS) && (std::abs(yMaxVox - yMinVox) > EPS) && (std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS))
+                        f << static_cast<double>(i)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) << "," << static_cast<double>(j)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) << "," << static_cast<double>(k)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) << std::endl;
                     else {
                         if (auxOut != 1){
                             std::cout << "No scaling could be done!\n" << std::endl; 
@@ -308,12 +310,13 @@ void fillInside(Array3D<unsigned char>& _voxs){
 int main(int argc, char* argv[])
 {
     // Input 
-    if (argc != 2){
-        std::cerr << "Usage: ./MyVox <path to file>.stl" << std::endl;
+    if (argc != 3){
+        std::cerr << "Usage: ./MyVox <path to file>.stl <path to output>.csv" << std::endl;
         std::exit(EXIT_FAILURE);
     }
     try{
     std::string fname(argv[1]);
+    std::string oname(argv[2]);
 
     // Import triangular geometry
     Geometry geo(fname);
@@ -440,7 +443,7 @@ int main(int argc, char* argv[])
     }
 
     // save the result
-    saveAsCSV("out.csv", voxs, xMax, yMax, zMax, xMin, yMin, zMin, xMaxVox, yMaxVox, zMaxVox, xMinVox, yMinVox, zMinVox);
+    saveAsCSV(oname, voxs, xMax, yMax, zMax, xMin, yMin, zMin, xMaxVox, yMaxVox, zMaxVox, xMinVox, yMinVox, zMinVox);
 
     // report some stats
     int num_in_vox = 0;
