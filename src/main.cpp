@@ -115,7 +115,7 @@ void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs,
 
     x1 /= x1_sum;
     y1 /= y1_sum;
-    z1 /= z1_sum;
+    z1 /= z1_sum;  
 
     int auxOut = 0;
     for(int i = sx - 1; i >= 0; i--){
@@ -129,13 +129,13 @@ void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs,
                 }
                 if (pal == 1){
                     if ((std::abs(xMax - xMin) > EPS) && (std::abs(xMaxVox - xMinVox) > EPS) && (SCALE_X))
-                        f << static_cast<double>(((double)i - x1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) - x0) << "," << static_cast<double>(((double)j - y1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) - y0) << "," << static_cast<double>(((double)k - z1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) - z0) << std::endl;
+                        f << static_cast<double>(((double)i - x1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) + x0)  << "," << static_cast<double>(((double)j - y1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) + z0) << std::endl;
                     else if ((std::abs(yMax - yMin) > EPS) && (std::abs(yMaxVox - yMinVox) > EPS) && (SCALE_Y))
-                        f << static_cast<double>(((double)i - x1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) - x0) << "," << static_cast<double>(((double)j - y1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) - y0) << "," << static_cast<double>(((double)k - z1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) - z0) << std::endl;
+                        f << static_cast<double>(((double)i - x1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + x0) << "," << static_cast<double>(((double)j - y1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + z0) << std::endl;
                     else if ((std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS) && (SCALE_Z))
-                        f << static_cast<double>(((double)i - x1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) - x0) << "," << static_cast<double>(((double)j - y1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) - y0) << "," << static_cast<double>(((double)k - z1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) - z0) << std::endl;
+                        f << static_cast<double>(((double)i - x1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + x0) << "," << static_cast<double>(((double)j - y1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + z0) << std::endl;
                     else if ((std::abs(xMax - xMin) > EPS) && (std::abs(xMaxVox - xMinVox) > EPS) && (std::abs(yMax - yMin) > EPS) && (std::abs(yMaxVox - yMinVox) > EPS) && (std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS))
-                        f << static_cast<double>(((double)i - x1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) - x0) << "," << static_cast<double>(((double)j - y1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) - y0) << "," << static_cast<double>(((double)k - z1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) - z0) << std::endl;
+                        f << static_cast<double>(((double)i - x1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) + x0) << "," << static_cast<double>(((double)j - y1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + z0) << std::endl;
                     else {
                         if (auxOut != 1){
                             std::cout << "No scaling could be done!\n" << std::endl; 
@@ -414,21 +414,9 @@ int main(int argc, char* argv[])
                 zMin = static_cast<double>(geo.posAt(p)(2));
         }
 
-        double x0_sum = 0.0;
-        double y0_sum = 0.0;
-        double z0_sum = 0.0;
-        for (int p = 0; p < geo.get_num_vert(); p++){
-            x0 += geo.posAt(p)(0);
-            x0_sum += 1;
-            y0 += geo.posAt(p)(1);
-            y0_sum += 1;
-            z0 += geo.posAt(p)(2);
-            z0_sum += 1;
-        }
-
-        x0 /= x0_sum;
-        y0 /= y0_sum;
-        z0 /= z0_sum;
+	x0 = geo.getCOG()(0);
+	y0 = geo.getCOG()(1);
+	z0 = geo.getCOG()(2);
 
         // prepare triangles
         tris.reserve(geo.get_num_tri());

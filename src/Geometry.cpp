@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Geometry.h"
 
-Geometry::Geometry(std::string fname) : bboxComputed(false), bboxMinCorner(0.f), bboxMaxCorner(0.f), bboxExtend(0.f) {
+Geometry::Geometry(std::string fname) : bboxComputed(false), bboxMinCorner(0.f), bboxMaxCorner(0.f), bboxExtend(0.f), cog(0.f), totalVolume(0.f) {
     std::cout << "Reading geometry ...\n";
     Geometry::read_stl_file(fname);
     std::cout << "done." << std::endl;
@@ -50,6 +50,9 @@ Vec3 Geometry::get_bbox() {
         double miny = 1e20f, maxy = -1e20f;
         double minz = 1e20f, maxz = -1e20f;
 
+	double totalVolume = 0.0, currentVolume;
+	double xCenter = 0.0, yCenter = 0.0, zCenter = 0.0;
+
         for (int i = 0; i < this->get_num_tri(); i++)
         {   for (int j = 0; j < 3; j++)
             {
@@ -79,6 +82,10 @@ Vec3 Geometry::get_bbox() {
                 if (z > maxz) maxz = z;
                 if (z < minz) minz = z;
             } 
+		totalVolume += currentVolume = (triangles[i].p1.x*triangles[i].p2.y*triangles[i].p3.z - triangles[i].p1.x*triangles[i].p3.y*triangles[i].p2.z - triangles[i].p2.x*triangles[i].p1.y*triangles[i].p3.z + triangles[i].p2.x*triangles[i].p3.y*triangles[i].p1.z + triangles[i].p3.x*triangles[i].p1.y*triangles[i].p2.z - triangles[i].p3.x*triangles[i].p2.y*triangles[i].p1.z) / 6.;
+		xCenter += ((triangles[i].p1.x + triangles[i].p2.x + triangles[i].p3.x) / 4.) * currentVolume;
+		yCenter += ((triangles[i].p1.y + triangles[i].p2.y + triangles[i].p3.y) / 4.) * currentVolume;
+		zCenter += ((triangles[i].p1.z + triangles[i].p2.z + triangles[i].p3.z) / 4.) * currentVolume;
         }
         this->bboxMinCorner.x = minx;
         this->bboxMinCorner.y = miny;
@@ -90,7 +97,11 @@ Vec3 Geometry::get_bbox() {
         this->bboxExtend.y = this->bboxMaxCorner.y - this->bboxMinCorner.y;
         this->bboxExtend.z = this->bboxMaxCorner.z - this->bboxMinCorner.z;
         this->bboxComputed = true;
-    }
+    	this->cog.x = xCenter/totalVolume;
+    	this->cog.y = yCenter/totalVolume;
+    	this->cog.z = zCenter/totalVolume;
+    	this->totalVolume = totalVolume;    
+	}
     return this->bboxExtend;
 }
 
