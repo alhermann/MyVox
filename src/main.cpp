@@ -42,6 +42,7 @@
 
 // --------------------------------------------------------------
 
+#define SCALE_XYZ 1
 #define SCALE_X 0
 #define SCALE_Y 0
 #define SCALE_Z 0
@@ -134,7 +135,7 @@ void saveAsCSV(std::string fname, const Array3D<unsigned char>& voxs,
                         f << static_cast<double>(((double)i - x1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + x0) << "," << static_cast<double>(((double)j - y1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + z0) << std::endl;
                     else if ((std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS) && (SCALE_Z))
                         f << static_cast<double>(((double)i - x1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + x0) << "," << static_cast<double>(((double)j - y1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + z0) << std::endl;
-                    else if ((std::abs(xMax - xMin) > EPS) && (std::abs(xMaxVox - xMinVox) > EPS) && (std::abs(yMax - yMin) > EPS) && (std::abs(yMaxVox - yMinVox) > EPS) && (std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS))
+                    else if ((std::abs(xMax - xMin) > EPS) && (std::abs(xMaxVox - xMinVox) > EPS) && (std::abs(yMax - yMin) > EPS) && (std::abs(yMaxVox - yMinVox) > EPS) && (std::abs(zMax - zMin) > EPS) && (std::abs(zMaxVox - zMinVox) > EPS) && (SCALE_XYZ))
                         f << static_cast<double>(((double)i - x1)*std::abs(xMax - xMin)/std::abs(xMaxVox - xMinVox) + x0) << "," << static_cast<double>(((double)j - y1)*std::abs(yMax - yMin)/std::abs(yMaxVox - yMinVox) + y0) << "," << static_cast<double>(((double)k - z1)*std::abs(zMax - zMin)/std::abs(zMaxVox - zMinVox) + z0) << std::endl;
                     else {
                         if (auxOut != 1){
