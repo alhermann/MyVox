@@ -16,7 +16,7 @@ have run the ```make``` command for installation.
 ```
 git clone https://github.com/alhermann/MyVox.git
 cd ~/MyVox/build
-make
+make clean && make
 ```
 
 Make sure to use the correct C++ compiler for your machine. For MacOS change inside the ```Makefile``` to ```clang++```, 
@@ -25,7 +25,8 @@ compiler.
 
 ## Example
 
-Pass an ```.stl``` file path as an argument. The voxelized output will be placed inside the ```build``` directory.
+Pass an ```.stl``` file path as an argument. The voxelized output will be placed inside the ```build``` directory. Optionally pass a 
+fourth argument as the voxel resolution.
 
 ```cd ~/MyVox/build
 ./MyVox ../model.stl ../model.csv
