@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <cstdlib>
+#include <string>
 #include "Geometry.h"
 #include "Vec2.h"
 #include "Vec3.h"
@@ -16,7 +17,7 @@
 // --------------------------------------------------------------
 
 // Macros
-#define VOXEL_RESOLUTION 128
+#define DEFAULT_VOXEL_RESOLUTION 128
 #define VOXEL_FILL_INSIDE 1
 #define VOXEL_ROBUST_FILL 1
 
@@ -34,7 +35,7 @@
 
 #define FP_POW 16
 #define FP_SCALE (1<<FP_POW)
-#define BOX_SCALE Vec3(VOXEL_RESOLUTION*FP_SCALE)
+// #define BOX_SCALE Vec3(VOXEL_RESOLUTION*FP_SCALE)
 
 // --------------------------------------------------------------
 
@@ -342,14 +343,23 @@ void fillInside(Array3D<unsigned char>& _voxs){
 
 int main(int argc, char* argv[])
 {
-    // Input 
-    if (argc != 3){
-        std::cerr << "Usage: ./MyVox <path to file>.stl <path to output>.csv" << std::endl;
+    // Input
+    if (argc < 3 || argc > 4){
+        std::cerr << "Usage: ./MyVox <path to file>.stl <path to output>.csv [voxel resolution]" << std::endl;
         std::exit(EXIT_FAILURE);
     }
     try{
     std::string fname(argv[1]);
     std::string oname(argv[2]);
+    
+    int VOXEL_RESOLUTION = DEFAULT_VOXEL_RESOLUTION;
+
+    // Overwrite voxel resolution if the argument is provided
+    if (argc == 4) {
+        VOXEL_RESOLUTION = std::stoi(argv[3]);
+    }
+    
+    Vec3 BOX_SCALE(VOXEL_RESOLUTION*FP_SCALE);
 
     // Import triangular geometry
     Geometry geo(fname);
