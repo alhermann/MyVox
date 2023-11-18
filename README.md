@@ -25,7 +25,8 @@ compiler.
 
 ## Example
 
-Pass an ```.stl``` file path as an argument. The voxelized output will be placed inside the ```build``` directory. Optionally pass a 
+Pass an ```.stl``` file path as an argument. The voxelized output will be placed inside the ```build``` directory. 
+Optionally pass a 
 fourth argument as the voxel resolution.
 
 ```cd ~/MyVox/build
